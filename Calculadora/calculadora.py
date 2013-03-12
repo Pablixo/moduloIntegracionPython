@@ -66,5 +66,6 @@ def main():
     elif(eleccion == "NO"):
         print ("ADIOS")
     else:
-        print ("Eleccion incorrecta")   
+        print ("Eleccion incorrecta")
+           
 main()
