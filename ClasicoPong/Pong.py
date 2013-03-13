@@ -3,8 +3,6 @@ Created on 13/03/2013
 
 @author: Alumno
 '''
-
-
 # ---------------------------
 # Importacion de los modulos
 # ---------------------------
@@ -65,6 +63,10 @@ class Pelota(pygame.sprite.Sprite):
             self.speed[1] = -self.speed[1]
         self.rect.move_ip((self.speed[0], self.speed[1]))
 
+    def colision(self, objetivo):
+        if self.rect.colliderect(objetivo.rect):
+            self.speed[0] = -self.speed[0]
+
 
 class Paleta(pygame.sprite.Sprite):
     "Define el comportamiento de las paletas de ambos jugadores"
@@ -83,6 +85,12 @@ class Paleta(pygame.sprite.Sprite):
         elif self.rect.top <= 0:
             self.rect.top = 0
 
+    def cpu(self, objetivo):
+        self.rect.centery = objetivo.rect.centery
+        if self.rect.bottom >= SCREEN_HEIGHT:
+            self.rect.bottom = SCREEN_HEIGHT
+        elif self.rect.top <= 0:
+            self.rect.top = 0
 
 # ------------------------------
 # Funcion principal del juego
@@ -98,17 +106,28 @@ def main():
     # cargamos los objetos
     fondo = load_image("fondo.jpg", IMG_DIR, alpha=False)
     bola = Pelota()
-    jugador1 = Paleta(40)
+    jugador1 = Paleta(10)
+    jugador2 = Paleta(SCREEN_WIDTH - 10)
 
     clock = pygame.time.Clock()
+    pygame.key.set_repeat(1, 25)  # Activa repeticion de teclas
+    pygame.mouse.set_visible(False)
 
     # el bucle principal del juego
     while True:
         clock.tick(60)
+        # Obtenemos la posicon del mouse
+        pos_mouse = pygame.mouse.get_pos()
+        mov_mouse = pygame.mouse.get_rel()
 
         # Actualizamos los obejos en pantalla
         jugador1.humano()
+        jugador2.cpu(bola)
         bola.update()
+
+        # Comprobamos si colisionan los objetos
+        bola.colision(jugador1)
+        bola.colision(jugador2)
 
         # Posibles entradas del teclado y mouse
         for event in pygame.event.get():
@@ -126,11 +145,15 @@ def main():
                     jugador1.rect.centery += 0
                 elif event.key == K_DOWN:
                     jugador1.rect.centery += 0
+            # Si el mouse no esta quieto mover la paleta a su posicion
+            elif mov_mouse[1] != 0:
+                jugador1.rect.centery = pos_mouse[1]
 
-        #actualizamos la pantalla
+        # actualizamos la pantalla
         screen.blit(fondo, (0, 0))
         screen.blit(bola.image, bola.rect)
         screen.blit(jugador1.image, jugador1.rect)
+        screen.blit(jugador2.image, jugador2.rect)
         pygame.display.flip()
 
 
