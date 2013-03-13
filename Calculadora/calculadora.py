@@ -15,8 +15,9 @@ def main():
     print ("******************\n")
       
     valor1 = int(input("Primer valor: "))       # Primer valor
-    valor2 = int(input("Segundo valor: "))      # Segundo valor
+    valor2 = int(input("Segundo valor: "))      # Segundo valor 
     calcular = True
+    seguir = True
    
     def sumar(numero1, numero2):    
         suma = numero1 + numero2
@@ -60,12 +61,15 @@ def main():
     print("Resultado: " + str(resultado))
     
     # Para volver a ejercutar la calculadora 
-    eleccion = input('Quieres realizar otra operacion (SI/NO)?')
-    if(eleccion == "SI"):
-        eleccion = main()
-    elif(eleccion == "NO"):
-        print ("ADIOS")
-    else:
-        print ("Eleccion incorrecta")
+    while(seguir):
+        eleccion = input('Quieres realizar otra operacion (SI/NO)?')
+        if(eleccion == "SI" or eleccion == "S"):
+            eleccion = main()
+            seguir = False
+        elif(eleccion == "NO" or eleccion == "N"):
+            print ("ADIOS")
+            seguir = False
+        else:
+            print ("Eleccion incorrecta")
            
 main()
