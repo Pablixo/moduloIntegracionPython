@@ -3,6 +3,11 @@ Created on 13/03/2013
 
 @author: Alumno
 '''
+'''
+Created on 13/03/2013
+
+@author: Alumno
+'''
 # ---------------------------
 # Importacion de los modulos
 # ---------------------------
@@ -19,7 +24,6 @@ import sys
 SCREEN_WIDTH = 640
 SCREEN_HEIGHT = 480
 IMG_DIR = "imagenes"
-SONIDO_DIR = "sonidos"
 
 # ------------------------------
 # Clases y Funciones utilizadas
@@ -42,16 +46,6 @@ def load_image(nombre, dir_imagen, alpha=False):
     return image
 
 
-#def load_sound(nombre, dir_sonido):
-#    ruta = os.path.join(dir_sonido, nombre)
-#    # Intentar cargar el sonido
-#    try:
-#        sonido = pygame.mixer.Sound(ruta)
-#    except pygame.error, message:
-#        print ("No se pudo cargar el sonido:", ruta)
-#        sonido = None
-#    return sonido
-
 # -----------------------------------------------
 # Creamos los sprites (clases) de los objetos del juego:
 
@@ -59,22 +53,17 @@ def load_image(nombre, dir_imagen, alpha=False):
 class Pelota(pygame.sprite.Sprite):
     "La bola y su comportamiento en la pantalla"
 
-    def __init__(self, sonido_golpe, sonido_punto):
+    def __init__(self):
         pygame.sprite.Sprite.__init__(self)
         self.image = load_image("bola.png", IMG_DIR, alpha=True)
         self.rect = self.image.get_rect()
         self.rect.centerx = SCREEN_WIDTH / 2
         self.rect.centery = SCREEN_HEIGHT / 2
         self.speed = [3, 3]
-        self.sonido_golpe = sonido_golpe
-        self.sonido_punto = sonido_punto
 
     def update(self):
         if self.rect.left < 0 or self.rect.right > SCREEN_WIDTH:
             self.speed[0] = -self.speed[0]
-            self.sonido_punto.play()  # Reproducir sonido de punto
-            self.rect.centerx = SCREEN_WIDTH / 2
-            self.rect.centery = SCREEN_HEIGHT / 2
         if self.rect.top < 0 or self.rect.bottom > SCREEN_HEIGHT:
             self.speed[1] = -self.speed[1]
         self.rect.move_ip((self.speed[0], self.speed[1]))
@@ -82,7 +71,6 @@ class Pelota(pygame.sprite.Sprite):
     def colision(self, objetivo):
         if self.rect.colliderect(objetivo.rect):
             self.speed[0] = -self.speed[0]
-            self.sonido_golpe.play()  # Reproducir sonido de rebote
 
 
 class Paleta(pygame.sprite.Sprite):
@@ -102,14 +90,12 @@ class Paleta(pygame.sprite.Sprite):
         elif self.rect.top <= 0:
             self.rect.top = 0
 
-    def cpu(self, pelota):
-        self.speed = [0, 2.5]
-        if pelota.speed[0] >= 0 and pelota.rect.centerx >= SCREEN_WIDTH / 2:
-            if self.rect.centery > pelota.rect.centery:
-                self.rect.centery -= self.speed[1]
-            if self.rect.centery < pelota.rect.centery:
-                self.rect.centery += self.speed[1]
-
+    def cpu(self, objetivo):
+        self.rect.centery = objetivo.rect.centery
+        if self.rect.bottom >= SCREEN_HEIGHT:
+            self.rect.bottom = SCREEN_HEIGHT
+        elif self.rect.top <= 0:
+            self.rect.top = 0
 
 # ------------------------------
 # Funcion principal del juego
@@ -118,19 +104,15 @@ class Paleta(pygame.sprite.Sprite):
 
 def main():
     pygame.init()
-    pygame.mixer.init()
     # creamos la ventana y le indicamos un titulo:
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     pygame.display.set_caption("Ejemplo de un Pong Simple")
 
     # cargamos los objetos
     fondo = load_image("fondo.jpg", IMG_DIR, alpha=False)
- #   sonido_golpe = load_sound("tennis.ogg", SONIDO_DIR)
- #   sonido_punto = load_sound("aplausos.ogg", SONIDO_DIR)
-
-    bola = Pelota(sonido_golpe, sonido_punto)
-    jugador1 = Paleta(40)
-    jugador2 = Paleta(SCREEN_WIDTH - 40)
+    bola = Pelota()
+    jugador1 = Paleta(10)
+    jugador2 = Paleta(SCREEN_WIDTH - 10)
 
     clock = pygame.time.Clock()
     pygame.key.set_repeat(1, 25)  # Activa repeticion de teclas
@@ -168,14 +150,15 @@ def main():
                     jugador1.rect.centery += 0
                 elif event.key == K_DOWN:
                     jugador1.rect.centery += 0
-            # Si el mouse no esta quieto, mover la paleta a su posicion
+            # Si el mouse no esta quieto mover la paleta a su posicion
             elif mov_mouse[1] != 0:
                 jugador1.rect.centery = pos_mouse[1]
 
         # actualizamos la pantalla
         screen.blit(fondo, (0, 0))
-        todos = pygame.sprite.RenderPlain(bola, jugador1, jugador2)
-        todos.draw(screen)
+        screen.blit(bola.image, bola.rect)
+        screen.blit(jugador1.image, jugador1.rect)
+        screen.blit(jugador2.image, jugador2.rect)
         pygame.display.flip()
 
 
