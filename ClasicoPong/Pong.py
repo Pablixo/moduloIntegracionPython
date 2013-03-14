@@ -42,15 +42,15 @@ def load_image(nombre, dir_imagen, alpha=False):
     return image
 
 
-#def load_sound(nombre, dir_sonido):
-#    ruta = os.path.join(dir_sonido, nombre)
-#    # Intentar cargar el sonido
-#    try:
-#        sonido = pygame.mixer.Sound(ruta)
-#    except pygame.error, message:
-#        print ("No se pudo cargar el sonido:", ruta)
-#        sonido = None
-#    return sonido
+def load_sound(nombre, dir_sonido):
+    ruta = os.path.join(dir_sonido, nombre)
+    # Intentar cargar el sonido
+    try:
+        sonido = pygame.mixer.Sound(ruta)
+    except pygame.error, message:
+        print ("No se pudo cargar el sonido:", ruta)
+        sonido = None
+    return sonido
 
 # -----------------------------------------------
 # Creamos los sprites (clases) de los objetos del juego:
@@ -125,8 +125,8 @@ def main():
 
     # cargamos los objetos
     fondo = load_image("fondo.jpg", IMG_DIR, alpha=False)
- #   sonido_golpe = load_sound("tennis.ogg", SONIDO_DIR)
- #   sonido_punto = load_sound("aplausos.ogg", SONIDO_DIR)
+    sonido_golpe = load_sound("tennis.ogg", SONIDO_DIR)
+    sonido_punto = load_sound("aplausos.ogg", SONIDO_DIR)
 
     bola = Pelota(sonido_golpe, sonido_punto)
     jugador1 = Paleta(40)
